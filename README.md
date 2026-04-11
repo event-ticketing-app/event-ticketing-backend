@@ -149,5 +149,5 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 ##  Author
 
 **Joel**
-- GitHub: [@TuUsuario](https://github.com/TuUsuario)
-- LinkedIn: [Tu Perfil](https://linkedin.com/in/TuPerfil)
+- GitHub: [@joeldc-dev](https://github.com/joeldc-dev)
+- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joel-doña-corral-6667473b4/)
