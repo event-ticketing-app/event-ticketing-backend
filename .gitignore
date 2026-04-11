@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 *.env
+Promptcontexto.txt
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -416,3 +417,40 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Archivos de configuración local específicos por ambiente
+appsettings.Local.json
+appsettings.Development.json
+appsettings.Production.json.local
+appsettings.Staging.json.local
+
+# Bases de datos locales
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+.Thumbs.db
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ReSharper settings por usuario
+*.sln.DotSettings.user
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Logs de aplicación
+Logs/
+logs/
+*.log
