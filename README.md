@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 About the Project
+##  About the Project
 
 Built with ASP.NET Core (.NET 8) following a Controller-based architecture, with a dedicated Service layer for business logic.
 
@@ -15,11 +15,11 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 - Shielding database entities using the DTO pattern
 - Keeping the codebase clean and maintainable as it scales
 
-> ⚠️ **Active development** — features are being added progressively. See the [Roadmap](#️-roadmap) for current status.
+>  **Active development** — features are being added progressively. See the [Roadmap](#️-roadmap) for current status.
 
 ---
 
-## ✨ Features
+##  Features
 
 - **JWT Authentication** — secure login and token generation via a dedicated `TokenService`
 - **Events API** — full CRUD for event management
@@ -42,7 +42,7 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Accesso.API/
@@ -66,7 +66,7 @@ Accesso.API/
 
 ---
 
-## ⚙️ Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -112,7 +112,7 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 
 ---
 
-## 📌 API Endpoints
+##  API Endpoints
 
 ### Auth
 
@@ -132,7 +132,7 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [x] JWT Authentication
 - [x] Events CRUD
@@ -146,7 +146,7 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 
 ---
 
-## 👤 Author
+##  Author
 
 **Joel**
 - GitHub: [@TuUsuario](https://github.com/TuUsuario)
