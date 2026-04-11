@@ -29,7 +29,7 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -45,7 +45,7 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 ##  Project Structure
 
 ```
-Accesso.API/
+Access.API/
 ├── Controllers/
 │   ├── AuthController.cs       # Registration & login endpoints
 │   └── EventsController.cs     # Event CRUD endpoints
@@ -70,48 +70,31 @@ Accesso.API/
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- .NET 8 SDK
 - SQL Server (local or remote)
-- A JWT secret key
 
 ### Setup
 
 1. **Clone the repository**
 
-```bash
 git clone https://github.com/event-ticketing-app/event-ticketing-backend.git
 cd event-ticketing-backend
-```
 
 2. **Configure your environment**
 
-Update `appsettings.json` with your connection string and JWT key:
+Copy the example file and fill in your own values:
 
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=YOUR_SERVER;Database=TicketingDB;Trusted_Connection=True;"
-},
-"Jwt": {
-  "Key": "YOUR_SECRET_KEY_HERE"
-}
-```
+cp appsettings.example.json Access.API/appsettings.Development.json
 
 3. **Apply migrations**
 
-```bash
 dotnet ef database update
-```
 
 4. **Run the API**
 
-```bash
 dotnet run
-```
 
-Open `https://localhost:<port>/swagger` to explore the endpoints.
-
----
-
+Open https://localhost:<port>/swagger to explore the endpoints.
 ##  API Endpoints
 
 ### Auth
