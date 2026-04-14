@@ -17,13 +17,24 @@ namespace Access.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventResponseDto>>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            var events = await _context.Events.ToListAsync();
+
+            return Ok(events.Select(e => new EventResponseDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                Date = e.Date,
+                Price = e.Price
+
+            }));
+            
         }
 
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(EventCreateDto dto)
+        public async Task<ActionResult<EventResponseDto>> PostEvent(EventCreateDto dto)
         {
             var newEvent = new Event
             {
@@ -33,14 +44,24 @@ namespace Access.API.Controllers
                 Price = dto.Price
             };
 
+
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEvent), new { id = newEvent.Id }, newEvent);
+            var responseDto = new EventResponseDto
+            {
+                Id = newEvent.Id,
+                Name = newEvent.Name,
+                Description = newEvent.Description,
+                Date = newEvent.Date,
+                Price = newEvent.Price
+
+            };
+            return CreatedAtAction(nameof(GetEvent), new { id = responseDto.Id }, responseDto);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<EventResponseDto>> GetEvent(int id)
         {
             var eventItem = await _context.Events.FindAsync(id);
 
@@ -49,7 +70,16 @@ namespace Access.API.Controllers
                 return NotFound();
             }
 
-            return eventItem;
+            var responseDto = new EventResponseDto
+            {
+                Id = eventItem.Id,
+                Name = eventItem.Name,
+                Description = eventItem.Description,
+                Date = eventItem.Date,
+                Price = eventItem.Price
+
+            };
+            return responseDto;
         }
 
         [HttpPut("{id}")]
