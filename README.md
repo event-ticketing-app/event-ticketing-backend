@@ -51,12 +51,14 @@ Access.API/
 │   └── EventsController.cs     # Event CRUD endpoints
 ├── Data/
 │   └── AppDbContext.cs          # EF Core database context
-├── Models/
-│   ├── Event.cs
-│   ├── User.cs
+├── DTOs/
 │   ├── EventCreateDto.cs
+│   ├── EventResponseDto.cs
 │   ├── UserCreateDto.cs
 │   └── LoginDto.cs
+├── Models/
+│   ├── Event.cs
+│   └── User.cs
 ├── Services/
 │   ├── ITokenService.cs         # Token service interface
 │   └── TokenService.cs          # JWT generation logic
@@ -108,10 +110,10 @@ Open https://localhost:<port>/swagger to explore the endpoints.
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/api/eventos` | List all events | No |
-| `POST` | `/api/eventos` | Create a new event | Yes |
-| `PUT` | `/api/eventos/{id}` | Update an event | Yes |
-| `DELETE` | `/api/eventos/{id}` | Delete an event | Yes |
+| `GET` | `/api/events` | List all events | No |
+| `POST` | `/api/events` | Create a new event | Yes |
+| `PUT` | `/api/events/{id}` | Update an event | Yes |
+| `DELETE` | `/api/events/{id}` | Delete an event | Yes |
 
 ---
 
