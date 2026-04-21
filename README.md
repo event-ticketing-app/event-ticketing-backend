@@ -123,6 +123,8 @@ Open https://localhost:<port>/swagger to explore the endpoints.
 - [x] Events CRUD
 - [x] DTO pattern (Mass Assignment protection)
 - [x] Service layer (TokenService)
+- [x] Password hashing (PasswordService)
+- [x] User registration endpoint
 - [ ] Users CRUD
 - [ ] Repository layer
 - [ ] Ticket reservation system
