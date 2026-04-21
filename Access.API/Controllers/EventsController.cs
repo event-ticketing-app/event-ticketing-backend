@@ -105,7 +105,8 @@ namespace Access.API.Controllers
 
         [HttpDelete("{id}")]
 
-        public async Task<IActionResult> DeleteEvent(int id){
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
 
             var eventItem = await _context.Events.FindAsync(id);
             if (eventItem == null){
@@ -114,7 +115,7 @@ namespace Access.API.Controllers
             }
             _context.Events.Remove(eventItem);
             
-             await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
 
             return NoContent();

@@ -10,9 +10,9 @@ namespace Access.API.Services
         private readonly IConfiguration _config;
 
         public TokenService(IConfiguration config)
-        {
+            {
             _config = config;
-        }
+            }
         
         public string CreateToken(User user)
         {

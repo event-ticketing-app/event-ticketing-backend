@@ -15,6 +15,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
