@@ -55,13 +55,17 @@ Access.API/
 │   ├── EventCreateDto.cs
 │   ├── EventResponseDto.cs
 │   ├── UserCreateDto.cs
+│   ├── UserResponseDto.cs
+│   ├── UserUpdateDto.cs  
 │   └── LoginDto.cs
 ├── Models/
 │   ├── Event.cs
 │   └── User.cs
 ├── Services/
 │   ├── ITokenService.cs         # Token service interface
-│   └── TokenService.cs          # JWT generation logic
+│   ├── TokenService.cs          # JWT generation logic
+│   ├── IPasswordService.cs      # Password service interface
+│   └── PasswordService.cs       # CreatePasswordHash(hash and salt) and VerifyPassword logic 
 ├── Migrations/                  # EF Core migration history
 └── Program.cs                   # DI container & app configuration
 ```
@@ -105,6 +109,7 @@ Open https://localhost:<port>/swagger to explore the endpoints.
 |---|---|---|---|
 | `POST` | `/api/auth/register` | Register a new user | No |
 | `POST` | `/api/auth/login` | Login and receive JWT | No |
+
 
 ### Events
 
