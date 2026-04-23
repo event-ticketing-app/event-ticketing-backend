@@ -135,6 +135,8 @@ Open https://localhost:<port>/swagger to explore the endpoints.
 - [ ] Ticket reservation system
 - [ ] Concurrency control (double-booking prevention)
 - [ ] Role-based access control (Admin / User)
+- [ ] Deployment (Azure / Railway)
+- [ ] Base de datos en la nube
 
 ---
 

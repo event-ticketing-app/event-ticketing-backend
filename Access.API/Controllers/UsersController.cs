@@ -4,9 +4,12 @@ using Access.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Access.API.Services;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace Access.API.Controllers
-{
+{   
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
 
@@ -21,6 +24,7 @@ namespace Access.API.Controllers
             _passwordService=passwordService;
 
         }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {

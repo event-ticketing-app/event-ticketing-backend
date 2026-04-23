@@ -16,7 +16,7 @@ namespace Access.API.Services
         
         public string CreateToken(User user)
         {
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var claims = new List<Claim>

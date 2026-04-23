@@ -3,6 +3,7 @@ using Access.API.Models;
 using Access.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Access.API.Controllers
 {
@@ -34,6 +35,7 @@ namespace Access.API.Controllers
             
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<EventResponseDto>> PostEvent(EventCreateDto dto)
         {
@@ -83,6 +85,7 @@ namespace Access.API.Controllers
             return responseDto;
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, EventCreateDto dto)
         {
@@ -103,8 +106,8 @@ namespace Access.API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
-
         public async Task<IActionResult> DeleteEvent(int id)
         {
 
