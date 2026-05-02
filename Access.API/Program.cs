@@ -35,6 +35,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 
 var app = builder.Build();
