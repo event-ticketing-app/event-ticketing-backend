@@ -67,7 +67,6 @@ namespace Access.API.Controllers
             return CreatedAtAction(nameof(GetUser), new{id =responseDto.Id}, responseDto);
 
         }
-    
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
