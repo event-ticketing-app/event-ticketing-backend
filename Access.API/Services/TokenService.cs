@@ -21,7 +21,8 @@ namespace Access.API.Services
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
             var token = new JwtSecurityToken(
@@ -30,6 +31,7 @@ namespace Access.API.Services
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
     }
 }

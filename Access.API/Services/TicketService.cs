@@ -60,10 +60,46 @@ namespace Access.API.Services
 
         }
 
-        public TicketPurchaseDto PurchaseTicket(int Id)
+        public async Task<TicketPuchaseResponseDto> PurchaseTicket(int Id)
         {
-            
+            var ticket =  await _context.Tickets
+                .Include(t => t.Event)
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.Id == Id);
 
+            if (ticket == null)
+            {
+                throw new Exception("Your ticket is not available");
+            }
+
+            if (ticket.Status != TicketStatus.Reserved)
+            {
+                throw new Exception("Ticket is not in reserved status");
+            }
+
+            if (ticket.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new Exception("Ticket reservation has expired");
+            }
+
+            ticket.Status = TicketStatus.Purchased;
+
+            await _context.SaveChangesAsync();
+
+            var responseDTO =  new TicketPurchaseResponseDto
+            {
+                EventName = ticket.Event.Name,
+                EventDescription = ticket.Event.Description,
+                UserName = ticket.User.Name,
+                Status = ticket.Status,
+                Price = ticket.Price,
+                EventDate = ticket.Event.Date,
+                PurchaseAt = DateTime.UtcNow
+
+
+            };
+
+            return responseDTO;
         }
 
     }
