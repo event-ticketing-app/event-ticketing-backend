@@ -1,9 +1,11 @@
 using Access.API.Data;
 using Access.API.Models;
 using Access.API.Services;
+using Access.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +65,8 @@ builder.Services.AddScoped<ITicketService, TicketService>();
 
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
