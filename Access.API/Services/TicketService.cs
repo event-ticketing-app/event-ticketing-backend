@@ -1,4 +1,8 @@
-
+using Access.API.Data;
+using Access.API.DTOs;
+using Access.API.Models;
+using Access.API.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Access.API.Services
 {
@@ -22,7 +26,7 @@ namespace Access.API.Services
             }
             var ticketocuppied = await _context.Tickets.Where(t => (t.Status == TicketStatus.Purchased || t.Status == TicketStatus.Reserved) && t.EventId == EventId).CountAsync();
 
-            if (ticketocuppied >= event1.ticketcapacity)
+            if (ticketocuppied >= event1.TicketCapacity)
             {
                 throw new Exception("Event is full");
 
@@ -60,7 +64,7 @@ namespace Access.API.Services
 
         }
 
-        public async Task<TicketPuchaseResponseDto> PurchaseTicket(int Id)
+        public async Task<TicketPurchaseResponseDto> PurchaseTicket(int Id)
         {
             var ticket =  await _context.Tickets
                 .Include(t => t.Event)

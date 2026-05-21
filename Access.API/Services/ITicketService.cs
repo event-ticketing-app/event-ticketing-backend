@@ -4,8 +4,8 @@ namespace Access.API.Services
 {
     public interface ITicketService
     {
-        TicketReserveResponseDto ReserveTicket (int EventId, int UserId);
-        TicketPurchaseResponseDto PurchaseTicket (int Id);
+        Task<TicketReserveResponseDto> ReserveTicket (int EventId, int UserId);
+        Task<TicketPurchaseResponseDto> PurchaseTicket (int Id);
 
     }
 

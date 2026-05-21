@@ -44,7 +44,8 @@ namespace Access.API.Controllers
                 Name = dto.Name,
                 Description = dto.Description,
                 Date = dto.Date,
-                Price = dto.Price
+                Price = dto.Price,
+                TicketCapacity = dto.TicketCapacity
             };
 
 
@@ -57,7 +58,8 @@ namespace Access.API.Controllers
                 Name = newEvent.Name,
                 Description = newEvent.Description,
                 Date = newEvent.Date,
-                Price = newEvent.Price
+                Price = newEvent.Price,
+                TicketCapacity = newEvent.TicketCapacity
 
             };
             return CreatedAtAction(nameof(GetEvent), new { id = responseDto.Id }, responseDto);
