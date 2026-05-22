@@ -12,6 +12,7 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 
 - Preventing double-booking through concurrency control
 - Protecting endpoints with JWT-based authentication
+- Role-based access control (Admin, Organizer, User)
 - Shielding database entities using the DTO pattern
 - Keeping the codebase clean and maintainable as it scales
 
@@ -22,14 +23,16 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 ## Features
 
 - **JWT Authentication** — secure login and token generation via a dedicated `TokenService`
-- **Events API** — full CRUD for event management
-- **Users API** — full CRUD for user management at admin level
+- **Role-Based Access Control** — three roles (`Admin`, `Organizer`, `User`) with endpoint-level protection via `[Authorize(Roles = "...")]`
+- **Events API** — full CRUD for event management, restricted to Organizer and Admin roles
+- **Users API** — full CRUD for user management, restricted to Admin role
 - **Ticket Reservation System** — reserve and purchase flow with 10-minute expiration control
+- **Global Error Handling** — `ExceptionMiddleware` catches all unhandled exceptions and returns clean JSON error responses
 - **Service Layer** — `TokenService`, `PasswordService` and `TicketService` isolate business logic from controllers
 - **Password Hashing** — secure registration using HMACSHA512 salt and hash via a dedicated `PasswordService`
 - **DTO Pattern** — input and output DTOs prevent Mass Assignment attacks and decouple the API contract from the database schema
 - **EF Core Migrations** — database schema managed with Entity Framework Core
-- **Swagger UI** — all endpoints documented and testable out of the box
+- **Swagger UI** — all endpoints documented and testable out of the box, with JWT Bearer authentication support
 
 ---
 
@@ -53,10 +56,12 @@ Access.API/
 ├── Controllers/
 │   ├── AuthController.cs        # Registration & login endpoints
 │   ├── EventsController.cs      # Event CRUD endpoints
-│   └── UsersController.cs       # User management endpoints
+│   ├── TicketsController.cs     # Ticket reservation & purchase endpoints
+│   └── UsersController.cs       # User management endpoints (Admin only)
 ├── Data/
 │   └── AppDbContext.cs           # EF Core database context
 ├── DTOs/
+│   ├── AdminUserCreateDto.cs
 │   ├── EventCreateDto.cs
 │   ├── EventResponseDto.cs
 │   ├── UserCreateDto.cs
@@ -66,7 +71,10 @@ Access.API/
 │   ├── TicketReserveResponseDto.cs
 │   └── TicketPurchaseResponseDto.cs
 ├── Enums/
-│   └── TicketStatus.cs           # Reserved, Purchased, Cancelled
+│   ├── TicketStatus.cs           # Reserved, Purchased, Cancelled
+│   └── UserRole.cs               # User, Organizer, Admin
+├── Middleware/
+│   └── ExceptionMiddleware.cs    # Global error handling
 ├── Models/
 │   ├── Event.cs
 │   ├── User.cs
@@ -130,7 +138,7 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Register a new user | No |
+| `POST` | `/api/auth/register` | Register a new user (role: User by default) | No |
 | `POST` | `/api/auth/login` | Login and receive JWT | No |
 
 ### Events
@@ -138,18 +146,19 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `GET` | `/api/events` | List all events | No |
-| `POST` | `/api/events` | Create a new event | Yes |
-| `PUT` | `/api/events/{id}` | Update an event | Yes |
-| `DELETE` | `/api/events/{id}` | Delete an event | Yes |
+| `POST` | `/api/events` | Create a new event | Organizer, Admin |
+| `PUT` | `/api/events/{id}` | Update an event | Organizer, Admin |
+| `DELETE` | `/api/events/{id}` | Delete an event | Organizer, Admin |
 
 ### Users
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/api/users` | List all users | Yes |
-| `GET` | `/api/users/{id}` | Get a user by ID | Yes |
-| `PUT` | `/api/users/{id}` | Update a user | Yes |
-| `DELETE` | `/api/users/{id}` | Delete a user | Yes |
+| `GET` | `/api/users` | List all users | Admin |
+| `GET` | `/api/users/{id}` | Get a user by ID | Admin |
+| `POST` | `/api/users` | Create a user with specific role | Admin |
+| `PUT` | `/api/users/{id}` | Update a user | Admin |
+| `DELETE` | `/api/users/{id}` | Delete a user | Admin |
 
 ### Tickets
 
@@ -170,10 +179,11 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 - [x] Password hashing (PasswordService)
 - [x] User registration endpoint
 - [x] Ticket model and reservation system (ReserveTicket)
-- [ ] Ticket purchase flow (PurchaseTicket)
+- [x] Ticket purchase flow (PurchaseTicket)
+- [x] Global error handling (ExceptionMiddleware)
+- [x] Role-based access control (Admin / Organizer / User)
 - [ ] Background job — auto-cancel expired reservations (Hangfire)
 - [ ] Concurrency control (double-booking prevention)
-- [ ] Role-based access control (Admin / User)
 - [ ] Payment gateway (Stripe)
 - [ ] QR code generation per ticket
 - [ ] Ticket types (General, VIP)
@@ -187,4 +197,4 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 
 **Joel**
 - GitHub: [@joeldc-dev](https://github.com/joeldc-dev)
-- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joel-doña-corral-6667473b4/)
+- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joel-dona-corral/)

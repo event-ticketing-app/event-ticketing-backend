@@ -1,3 +1,5 @@
+using Access.API.Enums;
+
 namespace Access.API.Models
 {
     public class User
@@ -10,7 +12,6 @@ namespace Access.API.Models
         
         public byte[] PasswordHash { get; set; } = new byte[0];
         public byte[] PasswordSalt { get; set; } = new byte[0];
-        
-        public string Role { get; set; } = "User";
+        public UserRole Role { get; set; }
     }
 }

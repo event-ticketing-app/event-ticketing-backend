@@ -35,7 +35,7 @@ namespace Access.API.Controllers
             
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer,Admin")]
         [HttpPost]
         public async Task<ActionResult<EventResponseDto>> PostEvent(EventCreateDto dto)
         {
@@ -87,7 +87,7 @@ namespace Access.API.Controllers
             return responseDto;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer,Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, EventCreateDto dto)
         {
@@ -108,7 +108,7 @@ namespace Access.API.Controllers
             return NoContent();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer,Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {

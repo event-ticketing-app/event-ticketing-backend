@@ -1,3 +1,5 @@
+using Access.API.Enums;
+
 namespace Access.API.DTOs
 {
     public class UserResponseDto
@@ -7,7 +9,7 @@ namespace Access.API.DTOs
         
         public string Email { get; set; } = string.Empty;
         
-        public  string Role {get; set; } = string.Empty;
+        public  UserRole Role {get; set; }
 
     }
 }

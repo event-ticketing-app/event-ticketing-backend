@@ -25,6 +25,7 @@ namespace Access.API.Controllers
 
         }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {
@@ -38,8 +39,9 @@ namespace Access.API.Controllers
                 Role = e.Role
             }));
         }
+    [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<UserResponseDto>> PostUser(UserCreateDto dto)
+    public async Task<ActionResult<UserResponseDto>> PostUser(AdminUserCreateDto dto)
         {
             _passwordService.CreatePasswordHash(dto.Password, out byte[] hash, out byte[] salt);
             
@@ -50,7 +52,8 @@ namespace Access.API.Controllers
                 Name = dto.Name,
                 Email = dto.Email,
                 PasswordHash = hash,
-                PasswordSalt = salt
+                PasswordSalt = salt,
+                Role = dto.Role
             };
 
             _context.Users.Add(newUser);
@@ -68,6 +71,8 @@ namespace Access.API.Controllers
 
         }
 
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
         {
@@ -85,7 +90,7 @@ namespace Access.API.Controllers
 
         }
 
-
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
 
     public async Task<IActionResult> PutUser(int id, UserUpdateDto dto)
@@ -104,7 +109,7 @@ namespace Access.API.Controllers
             return NoContent();
         }
 
-
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
     
     public async Task<ActionResult<UserResponseDto>> GetUser (int id)

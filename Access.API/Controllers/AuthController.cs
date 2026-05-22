@@ -56,7 +56,8 @@ namespace Access.API.Controllers
                 Name = dto.Name,
                 Email= dto.Email,
                 PasswordHash = hash,
-                PasswordSalt = salt 
+                PasswordSalt = salt,
+                Role = Enums.UserRole.User
 
             };
 
