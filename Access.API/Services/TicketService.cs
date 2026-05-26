@@ -50,7 +50,17 @@ namespace Access.API.Services
             };
 
             _context.Tickets.Add(newTicket);
-            await _context.SaveChangesAsync();
+            _context.Entry(event1).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new Exception("Event is full");
+            }
 
             var responseDTO = new TicketReserveResponseDto
             {

@@ -22,6 +22,10 @@ namespace Access.API.Data
 
             modelBuilder.Entity<Ticket>()
                 .Property(e => e.Price).HasPrecision(18,2);;
+
+            modelBuilder.Entity<Event>()
+                .Property(e => e.RowVersion)
+                .IsRowVersion();
         }
     }
 }   

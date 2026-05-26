@@ -8,5 +8,6 @@ namespace Access.API.Models
         public DateTime Date { get; set; }
         public decimal Price { get; set; }
         public int TicketCapacity { get; set; }
+        public byte[] RowVersion { get; set; }
     }
 }
