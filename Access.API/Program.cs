@@ -5,6 +5,8 @@ using Access.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Hangfire;
+using Access.API.Jobs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,8 +65,20 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddScoped<ITicketService, TicketService>();
 
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
+
+app.UseHangfireDashboard();
+
+RecurringJob.AddOrUpdate<ExpiredTicketsJob>(
+    "cancel-expired-tickets",
+    job => job.CancelExpiredTickets(),
+    "*/5 * * * *"
+);
 
 app.UseMiddleware<ExceptionMiddleware>();
 
