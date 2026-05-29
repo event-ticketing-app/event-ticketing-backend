@@ -1,9 +1,11 @@
 using Access.API.Data;
 using Access.API.Models;
 using Access.API.DTOs;
+using Access.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+
 
 namespace Access.API.Controllers
 {
@@ -11,17 +13,17 @@ namespace Access.API.Controllers
     [Route("api/[controller]")]
     public class EventsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IEventRepository _eventRepository;
 
-        public EventsController(AppDbContext context)
+        public EventsController(IEventRepository eventRepository)
         {
-            _context = context;
+            _eventRepository = eventRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventResponseDto>>> GetEvents()
         {
-            var events = await _context.Events.ToListAsync();
+            var events = await _eventRepository.GetAllAsync();
 
             return Ok(events.Select(e => new EventResponseDto
             {
@@ -49,8 +51,7 @@ namespace Access.API.Controllers
             };
 
 
-            _context.Events.Add(newEvent);
-            await _context.SaveChangesAsync();
+            newEvent = await _eventRepository.AddAsync(newEvent);
 
             var responseDto = new EventResponseDto
             {
@@ -68,7 +69,7 @@ namespace Access.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<EventResponseDto>> GetEvent(int id)
         {
-            var eventItem = await _context.Events.FindAsync(id);
+            var eventItem = await _eventRepository.GetByIdAsync(id);
 
             if (eventItem == null)
             {
@@ -91,19 +92,17 @@ namespace Access.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, EventCreateDto dto)
         {
-            var eventItem = await _context.Events.FindAsync(id);
 
-            if (eventItem == null)
+            var newEvent = new Event
             {
-                return NotFound();
-            }
 
-            eventItem.Name = dto.Name;
-            eventItem.Description = dto.Description;
-            eventItem.Date = dto.Date;
-            eventItem.Price = dto.Price;
-            
-            await _context.SaveChangesAsync();
+                Name = dto.Name,
+                Description = dto.Description,
+                Date = dto.Date,
+                Price = dto.Price,
+            };
+
+            await _eventRepository.UpdateAsync(id, newEvent);
 
             return NoContent();
         }
@@ -113,14 +112,8 @@ namespace Access.API.Controllers
         public async Task<IActionResult> DeleteEvent(int id)
         {
 
-            var eventItem = await _context.Events.FindAsync(id);
-            if (eventItem == null){
+            await _eventRepository.DeleteAsync(id);
 
-                return NotFound();
-            }
-            _context.Events.Remove(eventItem);
-            
-            await _context.SaveChangesAsync();
 
 
             return NoContent();
