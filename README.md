@@ -10,7 +10,7 @@ Built with ASP.NET Core (.NET 8) following a Controller-based architecture, with
 
 This is not a basic CRUD. The project focuses on solving real-world backend problems:
 
-- Preventing double-booking through concurrency control
+- Preventing double-booking through optimistic concurrency control
 - Protecting endpoints with JWT-based authentication
 - Role-based access control (Admin, Organizer, User)
 - Shielding database entities using the DTO pattern
@@ -27,6 +27,8 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 - **Events API** — full CRUD for event management, restricted to Organizer and Admin roles
 - **Users API** — full CRUD for user management, restricted to Admin role
 - **Ticket Reservation System** — reserve and purchase flow with 10-minute expiration control
+- **Background Job (Hangfire)** — automatically cancels expired reservations every 5 minutes, freeing up spots
+- **Optimistic Concurrency Control** — prevents double-booking using EF Core RowVersion tokens
 - **Global Error Handling** — `ExceptionMiddleware` catches all unhandled exceptions and returns clean JSON error responses
 - **Service Layer** — `TokenService`, `PasswordService` and `TicketService` isolate business logic from controllers
 - **Password Hashing** — secure registration using HMACSHA512 salt and hash via a dedicated `PasswordService`
@@ -45,6 +47,7 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 | ORM | Entity Framework Core 8 |
 | Database | SQL Server |
 | Auth | JWT (JSON Web Tokens) |
+| Background Jobs | Hangfire |
 | Docs | Swagger / Swashbuckle |
 
 ---
@@ -73,6 +76,8 @@ Access.API/
 ├── Enums/
 │   ├── TicketStatus.cs           # Reserved, Purchased, Cancelled
 │   └── UserRole.cs               # User, Organizer, Admin
+├── Jobs/
+│   └── ExpiredTicketsJob.cs      # Hangfire job to cancel expired reservations
 ├── Middleware/
 │   └── ExceptionMiddleware.cs    # Global error handling
 ├── Models/
@@ -182,12 +187,12 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 - [x] Ticket purchase flow (PurchaseTicket)
 - [x] Global error handling (ExceptionMiddleware)
 - [x] Role-based access control (Admin / Organizer / User)
-- [ ] Background job — auto-cancel expired reservations (Hangfire)
-- [ ] Concurrency control (double-booking prevention)
+- [x] Background job — auto-cancel expired reservations (Hangfire)
+- [x] Concurrency control (double-booking prevention)
+- [ ] Repository layer
 - [ ] Payment gateway (Stripe)
 - [ ] QR code generation per ticket
 - [ ] Ticket types (General, VIP)
-- [ ] Repository layer
 - [ ] Deployment (Azure / Railway)
 - [ ] Cloud database
 
