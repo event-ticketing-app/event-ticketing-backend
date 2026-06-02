@@ -1,6 +1,7 @@
 using Access.API.Data;
 using Access.API.Models;
 using Access.API.DTOs;
+using Access.API.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Access.API.Services;
 
@@ -12,7 +13,6 @@ namespace Access.API.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ITokenService _tokenService;
-
         private readonly IPasswordService _passwordService;   
 
         public AuthController(AppDbContext context, ITokenService tokenService, IPasswordService passwordService)
@@ -57,7 +57,7 @@ namespace Access.API.Controllers
                 Email= dto.Email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                Role = Enums.UserRole.User
+                Role = UserRole.User
 
             };
 

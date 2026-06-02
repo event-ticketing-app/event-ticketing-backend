@@ -2,6 +2,7 @@ using Access.API.Data;
 using Access.API.Models;
 using Access.API.Services;
 using Access.API.Middleware;
+using Access.API.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -73,9 +74,17 @@ builder.Services.AddHangfire(config =>
 
 builder.Services.AddHangfireServer();
 
+builder.Services.AddScoped<AdminSeeder>();
+
 var app = builder.Build();
 
-app.UseHangfireDashboard();
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await seeder.SeedAsync();
+}
+
+    app.UseHangfireDashboard();
 
 RecurringJob.AddOrUpdate<ExpiredTicketsJob>(
     "cancel-expired-tickets",
