@@ -1,27 +1,26 @@
 # event-ticketing-backend
-
+ 
 > REST API for an event ticket sales platform — focused on real backend challenges like concurrency control, secure authentication, and clean architecture.
-
+ 
 ---
-
+ 
 ## About the Project
-
+ 
 Built with ASP.NET Core (.NET 8) following a Controller-based architecture, with a dedicated Service layer for business logic.
-
+ 
 This is not a basic CRUD. The project focuses on solving real-world backend problems:
-
+ 
 - Preventing double-booking through optimistic concurrency control
 - Protecting endpoints with JWT-based authentication
 - Role-based access control (Admin, Organizer, User)
 - Shielding database entities using the DTO pattern
 - Keeping the codebase clean and maintainable as it scales
-
 > **Active development** — features are being added progressively. See the [Roadmap](#roadmap) for current status.
-
+ 
 ---
-
+ 
 ## Features
-
+ 
 - **JWT Authentication** — secure login and token generation via a dedicated `TokenService`
 - **Role-Based Access Control** — three roles (`Admin`, `Organizer`, `User`) with endpoint-level protection via `[Authorize(Roles = "...")]`
 - **Events API** — full CRUD for event management, restricted to Organizer and Admin roles
@@ -33,13 +32,14 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 - **Service Layer** — `TokenService`, `PasswordService` and `TicketService` isolate business logic from controllers
 - **Password Hashing** — secure registration using HMACSHA512 salt and hash via a dedicated `PasswordService`
 - **DTO Pattern** — input and output DTOs prevent Mass Assignment attacks and decouple the API contract from the database schema
+- **Repository Pattern** — `IEventRepository` / `EventRepository` decouples data access from business logic
+- **Admin Seeder** — default Admin user created automatically on startup
 - **EF Core Migrations** — database schema managed with Entity Framework Core
 - **Swagger UI** — all endpoints documented and testable out of the box, with JWT Bearer authentication support
-
 ---
-
+ 
 ## Tech Stack
-
+ 
 | Layer | Technology |
 |---|---|
 | Framework | ASP.NET Core (.NET 8) |
@@ -49,11 +49,11 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 | Auth | JWT (JSON Web Tokens) |
 | Background Jobs | Hangfire |
 | Docs | Swagger / Swashbuckle |
-
+ 
 ---
-
+ 
 ## Project Structure
-
+ 
 ```
 Access.API/
 ├── Controllers/
@@ -84,6 +84,11 @@ Access.API/
 │   ├── Event.cs
 │   ├── User.cs
 │   └── Ticket.cs
+├── Repositories/
+│   ├── IEventRepository.cs       # Event repository interface
+│   └── EventRepository.cs        # Event repository implementation
+├── Seeders/
+│   └── AdminSeeder.cs            # Default Admin user seeder
 ├── Services/
 │   ├── ITokenService.cs          # Token service interface
 │   ├── TokenService.cs           # JWT generation logic
@@ -94,69 +99,66 @@ Access.API/
 ├── Migrations/                   # EF Core migration history
 └── Program.cs                    # DI container & app configuration
 ```
-
+ 
 ---
-
+ 
 ## Getting Started
-
+ 
 ### Prerequisites
-
+ 
 - .NET 8 SDK
 - SQL Server (local or remote)
-
 ### Setup
-
+ 
 1. **Clone the repository**
-
 ```
 git clone https://github.com/event-ticketing-app/event-ticketing-backend.git
 cd event-ticketing-backend
 ```
-
+ 
 2. **Configure your environment**
-
 Copy the example file and fill in your own values:
-
+ 
 ```
 cp appsettings.example.json Access.API/appsettings.Development.json
 ```
-
+ 
 3. **Apply migrations**
-
 ```
 dotnet ef database update
 ```
-
+ 
 4. **Run the API**
-
 ```
 dotnet run
 ```
-
+ 
 Open `https://localhost:<port>/swagger` to explore the endpoints.
-
+ 
+> **Default Admin credentials** — after running the app for the first time, an Admin user is created automatically: `admin@admin.com` / `123`
+ 
 ---
-
+ 
 ## API Endpoints
-
+ 
 ### Auth
-
+ 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `POST` | `/api/auth/register` | Register a new user (role: User by default) | No |
 | `POST` | `/api/auth/login` | Login and receive JWT | No |
-
+ 
 ### Events
-
+ 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `GET` | `/api/events` | List all events | No |
 | `POST` | `/api/events` | Create a new event | Organizer, Admin |
 | `PUT` | `/api/events/{id}` | Update an event | Organizer, Admin |
 | `DELETE` | `/api/events/{id}` | Delete an event | Organizer, Admin |
-
+ 
 ### Users
-
+ 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `GET` | `/api/users` | List all users | Admin |
@@ -164,18 +166,18 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 | `POST` | `/api/users` | Create a user with specific role | Admin |
 | `PUT` | `/api/users/{id}` | Update a user | Admin |
 | `DELETE` | `/api/users/{id}` | Delete a user | Admin |
-
+ 
 ### Tickets
-
+ 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `POST` | `/api/tickets/reserve` | Reserve a ticket for an event | Yes |
 | `POST` | `/api/tickets/purchase/{id}` | Confirm purchase of a reserved ticket | Yes |
-
+ 
 ---
-
+ 
 ## Roadmap
-
+ 
 - [x] JWT Authentication
 - [x] Events CRUD
 - [x] Users CRUD
@@ -189,17 +191,21 @@ Open `https://localhost:<port>/swagger` to explore the endpoints.
 - [x] Role-based access control (Admin / Organizer / User)
 - [x] Background job — auto-cancel expired reservations (Hangfire)
 - [x] Concurrency control (double-booking prevention)
-- [ ] Repository layer
+- [x] Repository Pattern (Events)
+- [x] Admin Seeder
+- [ ] Repository Pattern (Users, Tickets)
+- [ ] EventService layer (Controller → Service → Repository)
+- [ ] Organizer ownership validation (only edit own events)
 - [ ] Payment gateway (Stripe)
 - [ ] QR code generation per ticket
 - [ ] Ticket types (General, VIP)
 - [ ] Deployment (Azure / Railway)
 - [ ] Cloud database
-
+- [ ] Angular frontend
 ---
-
+ 
 ## Author
-
+ 
 **Joel**
 - GitHub: [@joeldc-dev](https://github.com/joeldc-dev)
 - LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joel-dona-corral/)
