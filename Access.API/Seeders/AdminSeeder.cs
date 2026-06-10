@@ -23,14 +23,15 @@ namespace Access.API.Seeders
 
             if (adminExists) return;
 
-            var password = "123";
+            var email = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "admin@admin.com";
+            var password = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "123";
 
             _passwordService.CreatePasswordHash(password, out byte[] hash, out byte[] salt);
 
             var adminUser = new User
             {
                 Name = "Admin",
-                Email= "admin@admin.com",
+                Email= email,
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 Role = UserRole.Admin

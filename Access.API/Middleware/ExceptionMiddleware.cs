@@ -1,4 +1,4 @@
-
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Access.API.Middleware
@@ -18,12 +18,17 @@ namespace Access.API.Middleware
             {
                 await _next(context);
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                context.Response.StatusCode = 409;
+                await context.Response.WriteAsJsonAsync(new { message = "A conflict has ocurred, please try again"});
+            }
             catch (Exception ex)
             {
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message});
             }
-
+            
         }
     }
 }
