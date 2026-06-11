@@ -50,8 +50,6 @@ namespace Access.API.Repositories
         public async Task UpdateAsync(Ticket ticket)
         {
             
-            await _context.SaveChangesAsync();
-
         }
 
         public async Task SaveAsync()
