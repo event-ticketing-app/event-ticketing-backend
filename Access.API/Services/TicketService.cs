@@ -3,28 +3,31 @@ using Access.API.DTOs;
 using Access.API.Models;
 using Access.API.Enums;
 using Microsoft.EntityFrameworkCore;
+using Access.API.Repositories;
 
 namespace Access.API.Services
 {
     public class TicketService : ITicketService
     {
-        private readonly AppDbContext _context;
+        private readonly ITicketRepository _ticketRepository;
+        private readonly IEventRepository _eventRepository;
 
-        public TicketService (AppDbContext context)
+        public TicketService (ITicketRepository ticketRepository, IEventRepository eventRepository)
         {
-            _context = context;
+            _ticketRepository = ticketRepository;
+            _eventRepository = eventRepository;
 
         }
         public  async Task<TicketReserveResponseDto> ReserveTicket(int EventId, int UserId)
         {
 
-            var event1 = await _context.Events.FindAsync(EventId);
+            var event1 = await _eventRepository.GetByIdAsync( EventId);
 
             if (event1 == null)
             {
                 throw new Exception("Event doesn't exists");
             }
-            var ticketocuppied = await _context.Tickets.Where(t => (t.Status == TicketStatus.Purchased || t.Status == TicketStatus.Reserved) && t.EventId == EventId).CountAsync();
+            var ticketocuppied = await _ticketRepository.CountActiveTicketsAsync(EventId);
 
             if (ticketocuppied >= event1.TicketCapacity)
             {
@@ -32,7 +35,7 @@ namespace Access.API.Services
 
             }
 
-            var ticketuser = await _context.Tickets.Where(t => t.EventId == EventId && t.UserId == UserId && t.Status == TicketStatus.Reserved).AnyAsync();
+            var ticketuser = await _ticketRepository.HasActiveReservationAsync(EventId,UserId);
             
             if (ticketuser)
             {
@@ -49,12 +52,11 @@ namespace Access.API.Services
 
             };
 
-            _context.Tickets.Add(newTicket);
-            _context.Entry(event1).State = EntityState.Modified;
+            await _ticketRepository.AddAsync( newTicket, event1);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _ticketRepository.SaveAsync();
             }
 
             catch (DbUpdateConcurrencyException)
@@ -76,10 +78,7 @@ namespace Access.API.Services
 
         public async Task<TicketPurchaseResponseDto> PurchaseTicket(int Id)
         {
-            var ticket =  await _context.Tickets
-                .Include(t => t.Event)
-                .Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.Id == Id);
+            var ticket = await _ticketRepository.GetByIdWithDetailsAsync(Id);
 
             if (ticket == null)
             {
@@ -97,8 +96,8 @@ namespace Access.API.Services
             }
 
             ticket.Status = TicketStatus.Purchased;
-
-            await _context.SaveChangesAsync();
+            await _ticketRepository.UpdateAsync(ticket);
+            await _ticketRepository.SaveAsync();
 
             var responseDTO =  new TicketPurchaseResponseDto
             {

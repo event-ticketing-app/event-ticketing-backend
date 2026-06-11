@@ -69,6 +69,8 @@ builder.Services.AddScoped<ITicketService, TicketService>();
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+
 builder.Services.AddHangfire(config =>
     config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 
