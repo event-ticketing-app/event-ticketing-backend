@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Access.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Access.API.DTOs;
 
 namespace Access.API.Controllers
 {
@@ -21,10 +22,10 @@ namespace Access.API.Controllers
         [Authorize]
         [HttpPost("reserve")]
 
-        public async Task<IActionResult> Reserve(int eventId)
+        public async Task<IActionResult> Reserve([FromBody] TicketReserveDto dto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var reservedTicket = await _ticketService.ReserveTicket( eventId, userId);
+            var reservedTicket = await _ticketService.ReserveTicket( dto.EventId, userId);
 
             return CreatedAtAction(nameof(Reserve), reservedTicket);
 
