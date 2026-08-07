@@ -77,6 +77,9 @@ builder.Services.AddHangfire(config =>
 builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<AdminSeeder>();
+builder.Services.AddScoped<UserSeeder>();
+builder.Services.AddScoped<EventSeeder>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -90,12 +93,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowAngular");
-
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
-    await seeder.SeedAsync();
+    var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await adminSeeder.SeedAsync();
+    var userSeeder = scope.ServiceProvider.GetRequiredService<UserSeeder>();
+    await userSeeder.SeedAsync();
+    var eventSeeder = scope.ServiceProvider.GetRequiredService<EventSeeder>();
+    await eventSeeder.SeedAsync();
 }
 
     app.UseHangfireDashboard();
@@ -116,6 +121,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 

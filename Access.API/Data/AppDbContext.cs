@@ -18,7 +18,13 @@ namespace Access.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Event>()
-                .Property(e => e.Price).HasPrecision(18,2);
+                .HasOne(e => e.Organizer)
+                .WithMany()
+                .HasForeignKey(e => e.OrganizerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Event>()
+                .Property(e => e.Price).HasPrecision(18, 2);
 
             modelBuilder.Entity<Ticket>()
                 .Property(e => e.Price).HasPrecision(18,2);;

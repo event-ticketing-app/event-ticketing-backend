@@ -34,7 +34,8 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 - **Password Hashing** — secure registration using HMACSHA512 salt and hash via a dedicated `PasswordService`
 - **DTO Pattern** — input and output DTOs prevent Mass Assignment attacks and decouple the API contract from the database schema
 - **Repository Pattern** — `IEventRepository` / `EventRepository` decouples data access from business logic
-- **Admin Seeder** — default Admin user created automatically on startup via environment variables
+- **Data Seeders** — Admin, Users (Organizers + User) and Events seeded automatically on startup
+- **Organizer Ownership** — events are linked to their organizer via `OrganizerId`
 - **EF Core Migrations** — database schema managed with Entity Framework Core
 - **Swagger UI** — all endpoints documented and testable out of the box, with JWT Bearer authentication support
 
@@ -83,14 +84,16 @@ Access.API/
 ├── Middleware/
 │   └── ExceptionMiddleware.cs    # Global error handling
 ├── Models/
-│   ├── Event.cs
+│   ├── Event.cs                  # Includes OrganizerId (FK to User)
 │   ├── User.cs
 │   └── Ticket.cs
 ├── Repositories/
 │   ├── IEventRepository.cs       # Event repository interface
 │   └── EventRepository.cs        # Event repository implementation
 ├── Seeders/
-│   └── AdminSeeder.cs            # Default Admin user seeder
+│   ├── AdminSeeder.cs            # Default Admin user seeder
+│   ├── UsersSeeder.cs            # Organizer and User test accounts
+│   └── EventSeeder.cs            # Sample events linked to organizers
 ├── Services/
 │   ├── ITokenService.cs          # Token service interface
 │   ├── TokenService.cs           # JWT generation logic
@@ -151,7 +154,13 @@ dotnet run
 
 Open `http://localhost:<port>/swagger` to explore the endpoints.
 
-> **Default Admin credentials** — on first run, an Admin user is created automatically using the environment variables above.
+> **On first run**, the app automatically seeds the database with:
+> - An Admin user (credentials via environment variables)
+> - Two Organizer accounts (`tenant1@gmail.com`, `tenant2@gmail.com`)
+> - One User account (`user@gmail.com`)
+> - Two sample events, one per organizer
+>
+> All test passwords: `123`
 
 ---
 
@@ -209,8 +218,9 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 - [x] Concurrency control — 409 Conflict on collision (RowVersion)
 - [x] Repository Pattern (Events)
 - [x] Admin Seeder with environment variable support
+- [x] Data Seeders — Organizers, Users and sample Events on startup
+- [x] OrganizerId linked to Event model
 - [ ] Repository Pattern (Users, Tickets)
-- [ ] EventService layer (Controller → Service → Repository)
 - [ ] Organizer ownership validation (only edit own events)
 - [ ] Payment gateway (Stripe)
 - [ ] QR code generation per ticket
