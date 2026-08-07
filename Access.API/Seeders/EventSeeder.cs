@@ -32,7 +32,8 @@ namespace Access.API.Seeders
                 Description="This is an event",
                 Date = new DateTime(2026, 12, 15),
                 Price = 7.55m,
-                TicketCapacity = 10
+                TicketCapacity = 10,
+                ImageUrl= "https://plus.unsplash.com/premium_photo-1664303098912-a7f2ee19153f?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
             };
             var event2 = new Event
@@ -42,7 +43,8 @@ namespace Access.API.Seeders
                 Description = "This is an event2",
                 Date = new DateTime(2026, 12, 15),
                 Price = 10.55m,
-                TicketCapacity = 20
+                TicketCapacity = 20,
+                ImageUrl = "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
             };
 
