@@ -31,7 +31,9 @@ namespace Access.API.Controllers
                 Name = e.Name,
                 Description = e.Description,
                 Date = e.Date,
-                Price = e.Price
+                Price = e.Price,
+                ImageUrl = e.ImageUrl,
+                TicketCapacity = e.TicketCapacity
 
             }));
             
@@ -82,7 +84,9 @@ namespace Access.API.Controllers
                 Name = eventItem.Name,
                 Description = eventItem.Description,
                 Date = eventItem.Date,
-                Price = eventItem.Price
+                Price = eventItem.Price,
+                ImageUrl = eventItem.ImageUrl,
+                TicketCapacity = eventItem.TicketCapacity
 
             };
             return responseDto;
