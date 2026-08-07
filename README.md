@@ -234,4 +234,4 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 
 **Joel**
 - GitHub: [@joeldc-dev](https://github.com/joeldc-dev)
-- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joel-dona-corral/)
+- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joeldona
