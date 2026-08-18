@@ -66,6 +66,7 @@ namespace Access.API.Services
 
             var responseDTO = new TicketReserveResponseDto
             {
+                Id = newTicket.Id,
                 Status =  newTicket.Status,
                 Price =  newTicket.Price,
                 ExpiresAt = newTicket.ExpiresAt
