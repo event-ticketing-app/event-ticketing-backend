@@ -1,10 +1,11 @@
 using Access.API.Data;
-using Access.API.Models;
 using Access.API.DTOs;
+using Access.API.Models;
 using Access.API.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace Access.API.Controllers
@@ -96,7 +97,21 @@ namespace Access.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, EventCreateDto dto)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var eventItem = await _eventRepository.GetByIdAsync(id);
 
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            if (eventItem.OrganizerId != userId && !User.IsInRole("Admin"))
+            {
+
+                return Forbid();
+                
+
+            }
             var newEvent = new Event
             {
 
@@ -115,6 +130,21 @@ namespace Access.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var eventItem = await _eventRepository.GetByIdAsync(id);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            if (eventItem.OrganizerId != userId && !User.IsInRole("Admin"))
+            {
+
+                return Forbid();
+
+
+            }
 
             await _eventRepository.DeleteAsync(id);
 
