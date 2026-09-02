@@ -56,5 +56,16 @@ namespace Access.API.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(int userId)
+        {
+
+            return await _context.Tickets
+                .Include(t=> t.Event)
+                .Include(t=> t.User)
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+        }
+
     }
 }

@@ -10,6 +10,7 @@ namespace Access.API.Repositories
         Task<Ticket?> GetByIdWithDetailsAsync(int id);
         Task UpdateAsync(Ticket ticket);
         Task SaveAsync();
+        Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(int userId);
 
     }
 }

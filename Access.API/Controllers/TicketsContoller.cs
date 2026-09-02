@@ -47,15 +47,20 @@ namespace Access.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TicketPurchaseResponseDto>> GetTicket(int id)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var ticketItem = await _ticketRepository.GetByIdWithDetailsAsync(id);
 
             if (ticketItem == null)
             {
                 return NotFound();
             }
-
+            if (ticketItem.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
             var responseDto = new TicketPurchaseResponseDto
             {
+                Id = ticketItem.Id,
                 EventName = ticketItem.Event.Name,
                 EventDescription = ticketItem.Event.Description,
                 UserName = ticketItem.User.Name,
@@ -67,6 +72,26 @@ namespace Access.API.Controllers
             };
             return responseDto;
         }
+        [Authorize]
+        [HttpGet("my-tickets")]
+        public async Task<ActionResult<IEnumerable<TicketPurchaseResponseDto>>> GetTickets()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var tickets = await _ticketRepository.GetTicketsByUserIdAsync(userId);
+
+            return Ok(tickets.Select(e => new TicketPurchaseResponseDto
+            {
+                Id = e.Id,
+                EventName = e.Event.Name,
+                EventDescription = e.Event.Description,
+                UserName = e.User.Name,
+                Status = e.Status,
+                Price = e.Price,
+                EventDate = e.Event.Date,
+                PurchaseAt = DateTime.UtcNow
+            }));
+        }
+
 
     }
 

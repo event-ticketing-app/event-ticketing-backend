@@ -4,6 +4,7 @@ namespace Access.API.DTOs
 {
     public class TicketPurchaseResponseDto
     {
+        public int Id { get; set; }
         public string EventName {get; set;} = string.Empty;
         public string EventDescription {get; set;} = string.Empty;
         public string UserName {get; set;} = string.Empty;
