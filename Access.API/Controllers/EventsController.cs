@@ -44,8 +44,11 @@ namespace Access.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EventResponseDto>> PostEvent(EventCreateDto dto)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             var newEvent = new Event
             {
+                OrganizerId = userId,
                 Name = dto.Name,
                 Description = dto.Description,
                 Date = dto.Date,
@@ -152,6 +155,24 @@ namespace Access.API.Controllers
 
             return NoContent();
 
+        }
+        [Authorize]
+        [HttpGet("my-events")]
+        public async Task<ActionResult<IEnumerable<EventResponseDto>>> GetEventsByUser()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var events = await _eventRepository.GetEventsByUserIdAsync(userId);
+
+            return Ok(events.Select(e => new EventResponseDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                Date = e.Date,
+                Price = e.Price,
+                ImageUrl = e.ImageUrl,
+                TicketCapacity = e.TicketCapacity
+            }));
         }
 
     }

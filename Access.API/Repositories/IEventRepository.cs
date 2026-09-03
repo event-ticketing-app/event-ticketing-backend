@@ -9,6 +9,6 @@ namespace Access.API.Repositories
         Task<Event> AddAsync(Event newEvent);
         Task UpdateAsync(int id, Event newEvent);
         Task DeleteAsync(int id);
-
+        Task<IEnumerable<Event>> GetEventsByUserIdAsync(int userId);
     }
 }

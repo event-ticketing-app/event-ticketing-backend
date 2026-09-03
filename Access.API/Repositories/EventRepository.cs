@@ -66,6 +66,14 @@ namespace Access.API.Repositories
 
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Event>> GetEventsByUserIdAsync(int userId)
+        {
+
+            return await _context.Events
+                .Where(t => t.OrganizerId == userId)
+                .ToListAsync();
+        }
+
     }
 }
 
