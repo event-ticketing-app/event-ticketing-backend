@@ -1,10 +1,9 @@
-using Access.API.Data;
 using Access.API.Models;
 using Access.API.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Access.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Access.API.Repositories;
 
 
 namespace Access.API.Controllers
@@ -15,21 +14,20 @@ namespace Access.API.Controllers
 
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
         private readonly IPasswordService _passwordService;
 
-        public UsersController (AppDbContext context, IPasswordService passwordService)
+        public UsersController (IUserRepository userRepository, IPasswordService passwordService)
         {
-            _context = context;
-            _passwordService=passwordService;
-
+            _userRepository = userRepository;
+            _passwordService = passwordService;
         }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _userRepository.GetAllAsync();
 
             return Ok(users.Select(e => new UserResponseDto
             {
@@ -44,8 +42,6 @@ namespace Access.API.Controllers
     public async Task<ActionResult<UserResponseDto>> PostUser(AdminUserCreateDto dto)
         {
             _passwordService.CreatePasswordHash(dto.Password, out byte[] hash, out byte[] salt);
-            
-
 
             var newUser = new User
             {
@@ -56,8 +52,7 @@ namespace Access.API.Controllers
                 Role = dto.Role
             };
 
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
+            await _userRepository.AddAsync(newUser);
 
             var responseDto = new UserResponseDto
             {
@@ -66,7 +61,7 @@ namespace Access.API.Controllers
                 Email = newUser.Email,
                 Role = newUser.Role
             };
-            
+
             return CreatedAtAction(nameof(GetUser), new{id =responseDto.Id}, responseDto);
 
         }
@@ -76,15 +71,13 @@ namespace Access.API.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
         {
-            var userItem = await _context.Users.FindAsync(id);
+            var userItem = await _userRepository.GetByIdAsync(id);
             if (userItem == null)
             {
                 return NotFound();
             }
-            _context.Users.Remove(userItem);
-            
-            await _context.SaveChangesAsync();
 
+            await _userRepository.DeleteAsync(id);
 
             return NoContent();
 
@@ -95,27 +88,28 @@ namespace Access.API.Controllers
 
     public async Task<IActionResult> PutUser(int id, UserUpdateDto dto)
         {
-            var userItem = await _context.Users.FindAsync(id);
+            var userItem = await _userRepository.GetByIdAsync(id);
             if (userItem == null)
             {
                 return NotFound();
             }
+
             userItem.Name = dto.Name;
             userItem.Email = dto.Email;
             userItem.Role = dto.Role;
 
-            await _context.SaveChangesAsync();
+            await _userRepository.UpdateAsync(id, userItem);
 
             return NoContent();
         }
 
     [Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
-    
+
     public async Task<ActionResult<UserResponseDto>> GetUser (int id)
         {
 
-            var userItem = await _context.Users.FindAsync(id);
+            var userItem = await _userRepository.GetByIdAsync(id);
 
             if (userItem == null)
             {

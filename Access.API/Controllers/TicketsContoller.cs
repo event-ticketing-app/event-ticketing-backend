@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using Access.API.Services;
-using Microsoft.AspNetCore.Mvc;
 using Access.API.DTOs;
+using Access.API.Enums;
 using Access.API.Repositories;
+using Access.API.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Access.API.Controllers
 {
@@ -67,7 +68,8 @@ namespace Access.API.Controllers
                 Status = ticketItem.Status,
                 Price = ticketItem.Price,
                 EventDate = ticketItem.Event.Date,
-                PurchaseAt = DateTime.UtcNow
+                PurchaseAt = DateTime.UtcNow,
+                ImageUrl = ticketItem.Event.ImageUrl
 
             };
             return responseDto;
@@ -88,8 +90,24 @@ namespace Access.API.Controllers
                 Status = e.Status,
                 Price = e.Price,
                 EventDate = e.Event.Date,
-                PurchaseAt = DateTime.UtcNow
+                PurchaseAt = DateTime.UtcNow,
+                ImageUrl = e.Event.ImageUrl
             }));
+        }
+        [Authorize]
+        [HttpPost("cancel/{id}")]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var ticket = await _ticketRepository.GetByIdWithDetailsAsync(id);
+
+            if (ticket == null) return NotFound();
+            if (ticket.UserId != userId) return Forbid();
+            if (ticket.Status != TicketStatus.Reserved) return BadRequest("Ticket cannot be cancelled");
+            ticket.Status = TicketStatus.Cancelled;
+
+            await _ticketRepository.SaveAsync();
+            return NoContent();
         }
 
 

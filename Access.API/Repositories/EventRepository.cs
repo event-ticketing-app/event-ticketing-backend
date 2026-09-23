@@ -49,6 +49,8 @@ namespace Access.API.Repositories
             eventItem.Description = newEvent.Description;
             eventItem.Date = newEvent.Date;
             eventItem.Price = newEvent.Price;
+            eventItem.ImageUrl = newEvent.ImageUrl;
+            eventItem.TicketCapacity = newEvent.TicketCapacity;
 
             await _context.SaveChangesAsync();
         }

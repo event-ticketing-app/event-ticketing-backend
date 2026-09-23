@@ -66,6 +66,12 @@ namespace Access.API.Repositories
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Ticket>> GetAllAsync()
+        {
+            var tickets = await _context.Tickets.ToListAsync();
+
+            return tickets;
+        }
 
     }
 }

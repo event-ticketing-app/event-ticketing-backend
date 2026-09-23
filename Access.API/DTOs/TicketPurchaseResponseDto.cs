@@ -12,6 +12,7 @@ namespace Access.API.DTOs
         public decimal Price {get; set;}
         public DateTime EventDate {get; set;}
         public DateTime PurchaseAt {get; set;}
+        public string ImageUrl { get; set; } = string.Empty;
     }
 
 

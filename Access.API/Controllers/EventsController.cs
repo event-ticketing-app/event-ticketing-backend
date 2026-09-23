@@ -117,11 +117,12 @@ namespace Access.API.Controllers
             }
             var newEvent = new Event
             {
-
                 Name = dto.Name,
                 Description = dto.Description,
                 Date = dto.Date,
                 Price = dto.Price,
+                ImageUrl = dto.ImageUrl,
+                TicketCapacity = dto.TicketCapacity
             };
 
             await _eventRepository.UpdateAsync(id, newEvent);
