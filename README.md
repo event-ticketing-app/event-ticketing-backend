@@ -25,17 +25,18 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 - **JWT Authentication** — secure login and token generation via a dedicated `TokenService`
 - **Role-Based Access Control** — three roles (`Admin`, `Organizer`, `User`) with endpoint-level protection via `[Authorize(Roles = "...")]`
 - **Events API** — full CRUD for event management, restricted to Organizer and Admin roles
-- **Users API** — full CRUD for user management, restricted to Admin role
+- **Admin API** — centralized admin panel endpoints (dashboard metrics, user and ticket management)
 - **Ticket Reservation System** — reserve and purchase flow with 10-minute expiration control
+- **Ticket Cancellation** — users can manually cancel a reserved ticket before expiry
 - **Background Job (Hangfire)** — automatically cancels expired reservations every 5 minutes, freeing up spots
 - **Optimistic Concurrency Control** — prevents double-booking using EF Core RowVersion tokens, returns `409 Conflict` on collision
 - **Global Error Handling** — `ExceptionMiddleware` catches all unhandled exceptions and returns clean JSON error responses
 - **Service Layer** — `TokenService`, `PasswordService` and `TicketService` isolate business logic from controllers
-- **Password Hashing** — secure registration using HMACSHA512 salt and hash via a dedicated `PasswordService`
+- **Password Hashing** — secure registration using HMACSHA512 per-user salt and hash via a dedicated `PasswordService`
 - **DTO Pattern** — input and output DTOs prevent Mass Assignment attacks and decouple the API contract from the database schema
-- **Repository Pattern** — `IEventRepository` / `EventRepository` decouples data access from business logic
+- **Repository Pattern** — `IEventRepository`, `ITicketRepository` and `IUserRepository` decouple data access from business logic
 - **Data Seeders** — Admin, Users (Organizers + User) and Events seeded automatically on startup
-- **Organizer Ownership** — events are linked to their organizer via `OrganizerId`
+- **Organizer Ownership** — events are linked to their organizer via `OrganizerId`; Organizers can only edit/delete their own events
 - **EF Core Migrations** — database schema managed with Entity Framework Core
 - **Swagger UI** — all endpoints documented and testable out of the box, with JWT Bearer authentication support
 
@@ -61,9 +62,9 @@ This is not a basic CRUD. The project focuses on solving real-world backend prob
 Access.API/
 ├── Controllers/
 │   ├── AuthController.cs        # Registration & login endpoints
-│   ├── EventsController.cs      # Event CRUD endpoints
-│   ├── TicketsController.cs     # Ticket reservation & purchase endpoints
-│   └── UsersController.cs       # User management endpoints (Admin only)
+│   ├── EventsController.cs      # Event CRUD endpoints (Organizer/Admin)
+│   ├── TicketsController.cs     # Ticket reservation, purchase, cancellation & user ticket endpoints
+│   └── AdminController.cs       # Admin panel — dashboard metrics + user/ticket management
 ├── Data/
 │   └── AppDbContext.cs           # EF Core database context
 ├── DTOs/
@@ -74,6 +75,7 @@ Access.API/
 │   ├── UserResponseDto.cs
 │   ├── UserUpdateDto.cs
 │   ├── LoginDto.cs
+│   ├── TicketReserveDto.cs
 │   ├── TicketReserveResponseDto.cs
 │   └── TicketPurchaseResponseDto.cs
 ├── Enums/
@@ -84,22 +86,26 @@ Access.API/
 ├── Middleware/
 │   └── ExceptionMiddleware.cs    # Global error handling
 ├── Models/
-│   ├── Event.cs                  # Includes OrganizerId (FK to User)
+│   ├── Event.cs                  # Includes OrganizerId (FK to User) and RowVersion
 │   ├── User.cs
 │   └── Ticket.cs
 ├── Repositories/
-│   ├── IEventRepository.cs       # Event repository interface
-│   └── EventRepository.cs        # Event repository implementation
+│   ├── IEventRepository.cs
+│   ├── EventRepository.cs
+│   ├── ITicketRepository.cs
+│   ├── TicketRepository.cs
+│   ├── IUserRepository.cs
+│   └── UserRepository.cs
 ├── Seeders/
-│   ├── AdminSeeder.cs            # Default Admin user seeder
+│   ├── AdminSeeder.cs            # Default Admin user seeder (env vars)
 │   ├── UsersSeeder.cs            # Organizer and User test accounts
 │   └── EventSeeder.cs            # Sample events linked to organizers
 ├── Services/
-│   ├── ITokenService.cs          # Token service interface
+│   ├── ITokenService.cs
 │   ├── TokenService.cs           # JWT generation logic
-│   ├── IPasswordService.cs       # Password service interface
-│   ├── PasswordService.cs        # CreatePasswordHash and VerifyPassword logic
-│   ├── ITicketService.cs         # Ticket service interface
+│   ├── IPasswordService.cs
+│   ├── PasswordService.cs        # HMACSHA512 hash + salt
+│   ├── ITicketService.cs
 │   └── TicketService.cs          # Reservation and purchase logic
 ├── Migrations/                   # EF Core migration history
 └── Program.cs                    # DI container & app configuration
@@ -170,7 +176,7 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Register a new user (role: User by default) | No |
+| `POST` | `/api/auth/register` | Register a new user (role optional) | No |
 | `POST` | `/api/auth/login` | Login and receive JWT | No |
 
 ### Events
@@ -178,19 +184,11 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | `GET` | `/api/events` | List all events | No |
+| `GET` | `/api/events/{id}` | Get event by ID | No |
+| `GET` | `/api/events/my-events` | Get organizer's own events | Organizer |
 | `POST` | `/api/events` | Create a new event | Organizer, Admin |
-| `PUT` | `/api/events/{id}` | Update an event | Organizer, Admin |
-| `DELETE` | `/api/events/{id}` | Delete an event | Organizer, Admin |
-
-### Users
-
-| Method | Endpoint | Description | Auth |
-|---|---|---|---|
-| `GET` | `/api/users` | List all users | Admin |
-| `GET` | `/api/users/{id}` | Get a user by ID | Admin |
-| `POST` | `/api/users` | Create a user with specific role | Admin |
-| `PUT` | `/api/users/{id}` | Update a user | Admin |
-| `DELETE` | `/api/users/{id}` | Delete a user | Admin |
+| `PUT` | `/api/events/{id}` | Update an event (ownership validated) | Organizer, Admin |
+| `DELETE` | `/api/events/{id}` | Delete an event (ownership validated) | Organizer, Admin |
 
 ### Tickets
 
@@ -198,33 +196,53 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 |---|---|---|---|
 | `POST` | `/api/tickets/reserve` | Reserve a ticket for an event | Yes |
 | `POST` | `/api/tickets/purchase/{id}` | Confirm purchase of a reserved ticket | Yes |
+| `POST` | `/api/tickets/cancel/{id}` | Cancel a reserved ticket | Yes |
+| `GET` | `/api/tickets/{id}` | Get ticket details (ownership validated) | Yes |
+| `GET` | `/api/tickets/my-tickets` | Get all tickets for the authenticated user | Yes |
+
+### Admin
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/admin/dashboard` | Platform metrics (users, events, tickets, revenue) | Admin |
+| `GET` | `/api/admin/users` | List all users | Admin |
+| `GET` | `/api/admin/users/{id}` | Get user by ID | Admin |
+| `POST` | `/api/admin/users` | Create a user with specific role | Admin |
+| `PUT` | `/api/admin/users/{id}` | Update a user | Admin |
+| `DELETE` | `/api/admin/users/{id}` | Delete a user | Admin |
 
 ---
 
 ## Roadmap
 
 - [x] JWT Authentication
-- [x] Events CRUD
-- [x] Users CRUD
+- [x] Events CRUD with organizer ownership validation
 - [x] DTO pattern (Mass Assignment protection)
 - [x] Service layer (TokenService, PasswordService, TicketService)
-- [x] Password hashing (PasswordService)
-- [x] User registration endpoint
-- [x] Ticket model and reservation system (ReserveTicket)
-- [x] Ticket purchase flow (PurchaseTicket)
+- [x] Password hashing — HMACSHA512 with per-user salt
+- [x] User registration with optional role
+- [x] Ticket reservation system with 10-minute expiry
+- [x] Ticket purchase flow
+- [x] Ticket cancellation (manual)
+- [x] My tickets endpoint (filtered by authenticated user)
 - [x] Global error handling (ExceptionMiddleware)
 - [x] Role-based access control (Admin / Organizer / User)
 - [x] Background job — auto-cancel expired reservations (Hangfire)
 - [x] Concurrency control — 409 Conflict on collision (RowVersion)
-- [x] Repository Pattern (Events)
+- [x] Repository Pattern (Events, Tickets, Users)
 - [x] Admin Seeder with environment variable support
 - [x] Data Seeders — Organizers, Users and sample Events on startup
 - [x] OrganizerId linked to Event model
-- [ ] Repository Pattern (Users, Tickets)
-- [ ] Organizer ownership validation (only edit own events)
+- [x] Admin panel endpoints — dashboard metrics and user management
+- [x] UsersController refactored into AdminController
+- [ ] Pepper — add server-side secret to password hashing
+- [ ] Organizer dashboard — per-event metrics (tickets sold, revenue)
 - [ ] Payment gateway (Stripe)
 - [ ] QR code generation per ticket
 - [ ] Ticket types (General, VIP)
+- [ ] Logging
+- [ ] Unit tests
+- [ ] Azure DevOps CI/CD
 - [ ] Deployment (Azure)
 - [ ] Cloud database
 
@@ -234,4 +252,4 @@ Open `http://localhost:<port>/swagger` to explore the endpoints.
 
 **Joel**
 - GitHub: [@joeldc-dev](https://github.com/joeldc-dev)
-- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joeldona
+- LinkedIn: [Joel Doña Corral](https://www.linkedin.com/in/joeldona/)
