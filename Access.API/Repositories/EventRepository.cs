@@ -15,35 +15,29 @@ namespace Access.API.Repositories
 
         public async Task<IEnumerable<Event>> GetAllAsync()
         {
-            var events = await _context.Events.ToListAsync();
-
-            return events;
+            return await _context.Events
+                .Include(e => e.Organizer)
+                .ToListAsync();
         }
 
-        public async Task<Event?> GetByIdAsync(int id) 
+        public async Task<Event?> GetByIdAsync(int id)
         {
-            var eventItem = await _context.Events.FindAsync(id);
-
-            return eventItem;
+            return await _context.Events
+                .Include(e => e.Organizer)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Event> AddAsync(Event newEvent)
         {
             _context.Events.Add(newEvent);
-
             await _context.SaveChangesAsync();
-
             return newEvent;
         }
 
         public async Task UpdateAsync(int id, Event newEvent)
         {
             var eventItem = await _context.Events.FindAsync(id);
-
-            if (eventItem == null)  
-            {
-                return;
-            }
+            if (eventItem == null) return;
 
             eventItem.Name = newEvent.Name;
             eventItem.Description = newEvent.Description;
@@ -58,24 +52,17 @@ namespace Access.API.Repositories
         public async Task DeleteAsync(int id)
         {
             var eventItem = await _context.Events.FindAsync(id);
-
-            if (eventItem == null)
-            {
-                return;
-            }
+            if (eventItem == null) return;
 
             _context.Events.Remove(eventItem);
-
             await _context.SaveChangesAsync();
         }
+
         public async Task<IEnumerable<Event>> GetEventsByUserIdAsync(int userId)
         {
-
             return await _context.Events
                 .Where(t => t.OrganizerId == userId)
                 .ToListAsync();
         }
-
     }
 }
-
