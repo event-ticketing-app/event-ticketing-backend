@@ -1,4 +1,5 @@
 using Access.API.Data;
+using Access.API.Enums;
 using Access.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,6 +58,10 @@ namespace Access.API.Repositories
 
             _context.Users.Remove(userItem);
             await _context.SaveChangesAsync();
+        }
+        public async Task<IEnumerable<User>> GetByRoleAsync(UserRole role)
+        {
+            return await _context.Users.Where(u => u.Role == role).ToListAsync();
         }
     }
 }

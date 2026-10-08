@@ -1,4 +1,5 @@
 ﻿using Access.API.DTOs;
+using Access.API.Enums;
 using Access.API.Models;
 using Access.API.Repositories;
 using Access.API.Services;
@@ -99,5 +100,19 @@ namespace Access.API.Controllers
             await _userRepository.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpGet("organizers")]
+        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetOrganizers()
+        {
+            var users = await _userRepository.GetByRoleAsync(UserRole.Organizer);
+            return Ok(users.Select(e => new UserResponseDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Email = e.Email,
+                Role = e.Role
+            }));
+        }
+
     }
 }

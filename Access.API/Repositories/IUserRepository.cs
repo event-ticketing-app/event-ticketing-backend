@@ -1,3 +1,4 @@
+using Access.API.Enums;
 using Access.API.Models;
 
 namespace Access.API.Repositories
@@ -9,5 +10,6 @@ namespace Access.API.Repositories
         Task<User> AddAsync(User newUser);
         Task UpdateAsync(int id, User newUser);
         Task DeleteAsync(int id);
+        Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
     }
 }
