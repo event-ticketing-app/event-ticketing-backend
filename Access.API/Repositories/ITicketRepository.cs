@@ -12,5 +12,6 @@ namespace Access.API.Repositories
         Task SaveAsync();
         Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(int userId);
         Task<IEnumerable<Ticket>> GetAllAsync();
+        Task DeleteAsync(int id);
     }
 }

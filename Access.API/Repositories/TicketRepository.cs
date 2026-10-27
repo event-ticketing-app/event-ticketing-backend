@@ -49,7 +49,7 @@ namespace Access.API.Repositories
 
         public async Task UpdateAsync(Ticket ticket)
         {
-            
+            _context.Entry(ticket).State = EntityState.Modified;
         }
 
         public async Task SaveAsync()
@@ -68,10 +68,19 @@ namespace Access.API.Repositories
         }
         public async Task<IEnumerable<Ticket>> GetAllAsync()
         {
-            var tickets = await _context.Tickets.ToListAsync();
-
-            return tickets;
+            return await _context.Tickets
+                .Include(t => t.Event)
+                .Include(t => t.User)
+                .ToListAsync();
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var ticket = await _context.Tickets.FindAsync(id);
+            if (ticket != null)
+            {
+                _context.Tickets.Remove(ticket);
+            }
+        }
     }
 }
