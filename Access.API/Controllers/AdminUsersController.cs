@@ -97,6 +97,14 @@ namespace Access.API.Controllers
             var userItem = await _userRepository.GetByIdAsync(id);
             if (userItem == null) return NotFound();
 
+            if (userItem.Role == UserRole.Admin)
+            {
+                var admins = await _userRepository.GetByRoleAsync(UserRole.Admin);
+                if (admins.Count() == 1)
+                {
+                    return BadRequest("You cant delete the last admin");
+                }
+            }
             await _userRepository.DeleteAsync(id);
             return NoContent();
         }
