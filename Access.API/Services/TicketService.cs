@@ -97,6 +97,7 @@ namespace Access.API.Services
             }
 
             ticket.Status = TicketStatus.Purchased;
+            ticket.PurchaseDate = DateTime.UtcNow;
             await _ticketRepository.UpdateAsync(ticket);
             await _ticketRepository.SaveAsync();
 
@@ -108,7 +109,7 @@ namespace Access.API.Services
                 Status = ticket.Status,
                 Price = ticket.Price,
                 EventDate = ticket.Event.Date,
-                PurchaseAt = DateTime.UtcNow
+                PurchaseAt = ticket.PurchaseDate
 
 
             };
