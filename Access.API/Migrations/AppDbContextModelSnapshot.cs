@@ -58,6 +58,9 @@ namespace Access.API.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("TicketCapacity")
                         .HasColumnType("int");
 

@@ -1,4 +1,6 @@
 
+using Access.API.Enums;
+
 namespace Access.API.Models
 {
     public class Event
@@ -12,6 +14,7 @@ namespace Access.API.Models
         public decimal Price { get; set; }
         public int TicketCapacity { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
+        public EventStatus Status { get; set; } = EventStatus.Pending;
         public byte[] RowVersion { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using Access.API.Data;
 using Access.API.DTOs;
+using Access.API.Enums;
 using Access.API.Models;
 using Access.API.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +27,8 @@ namespace Access.API.Controllers
         {
             var events = await _eventRepository.GetAllAsync();
 
-            return Ok(events.Select(e => new EventResponseDto
+            // Only approved events are public
+            return Ok(events.Where(e => e.Status == EventStatus.Active).Select(e => new EventResponseDto
             {
                 Id = e.Id,
                 Name = e.Name,
@@ -34,7 +36,8 @@ namespace Access.API.Controllers
                 Date = e.Date,
                 Price = e.Price,
                 ImageUrl = e.ImageUrl,
-                TicketCapacity = e.TicketCapacity
+                TicketCapacity = e.TicketCapacity,
+                Status = e.Status
 
             }));
             
@@ -53,7 +56,10 @@ namespace Access.API.Controllers
                 Description = dto.Description,
                 Date = dto.Date,
                 Price = dto.Price,
-                TicketCapacity = dto.TicketCapacity
+                ImageUrl = dto.ImageUrl,
+                TicketCapacity = dto.TicketCapacity,
+                // Organizer events always need admin approval
+                Status = EventStatus.Pending
             };
 
 
@@ -66,7 +72,9 @@ namespace Access.API.Controllers
                 Description = newEvent.Description,
                 Date = newEvent.Date,
                 Price = newEvent.Price,
-                TicketCapacity = newEvent.TicketCapacity
+                ImageUrl = newEvent.ImageUrl,
+                TicketCapacity = newEvent.TicketCapacity,
+                Status = newEvent.Status
 
             };
             return CreatedAtAction(nameof(GetEvent), new { id = responseDto.Id }, responseDto);
@@ -90,7 +98,8 @@ namespace Access.API.Controllers
                 Date = eventItem.Date,
                 Price = eventItem.Price,
                 ImageUrl = eventItem.ImageUrl,
-                TicketCapacity = eventItem.TicketCapacity
+                TicketCapacity = eventItem.TicketCapacity,
+                Status = eventItem.Status
 
             };
             return responseDto;
@@ -122,7 +131,9 @@ namespace Access.API.Controllers
                 Date = dto.Date,
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl,
-                TicketCapacity = dto.TicketCapacity
+                TicketCapacity = dto.TicketCapacity,
+                // Any change made by an organizer must be approved again
+                Status = EventStatus.Pending
             };
 
             await _eventRepository.UpdateAsync(id, newEvent);
@@ -172,7 +183,8 @@ namespace Access.API.Controllers
                 Date = e.Date,
                 Price = e.Price,
                 ImageUrl = e.ImageUrl,
-                TicketCapacity = e.TicketCapacity
+                TicketCapacity = e.TicketCapacity,
+                Status = e.Status
             }));
         }
 

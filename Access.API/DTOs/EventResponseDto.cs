@@ -1,3 +1,5 @@
+using Access.API.Enums;
+
 namespace Access.API.DTOs
 {
     public class EventResponseDto
@@ -9,5 +11,6 @@ namespace Access.API.DTOs
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public int TicketCapacity {get; set;}
+        public EventStatus Status { get; set; }
     }
 }

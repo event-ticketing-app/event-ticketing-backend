@@ -26,6 +26,8 @@ namespace Access.API.Controllers
             var result = tickets.Select(ticket => new AdminTicketResponseDto
             {
                 Id = ticket.Id,
+                EventId = ticket.EventId,
+                UserId = ticket.UserId,
                 EventName = ticket.Event?.Name ?? string.Empty,
                 EventDescription = ticket.Event?.Description ?? string.Empty,
                 UserName = ticket.User?.Name ?? string.Empty,
@@ -45,6 +47,8 @@ namespace Access.API.Controllers
             var dto = new AdminTicketResponseDto
             {
                 Id = ticket.Id,
+                EventId = ticket.EventId,
+                UserId = ticket.UserId,
                 EventName = ticket.Event?.Name ?? string.Empty,
                 EventDescription = ticket.Event?.Description ?? string.Empty,
                 UserName = ticket.User?.Name ?? string.Empty,

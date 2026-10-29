@@ -1,4 +1,5 @@
 ﻿using Access.API.DTOs;
+using Access.API.Enums;
 using Access.API.Models;
 using Access.API.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -32,7 +33,8 @@ namespace Access.API.Controllers
                 TicketCapacity = e.TicketCapacity,
                 ImageUrl = e.ImageUrl,
                 OrganizerName = e.Organizer?.Name ?? string.Empty,
-                OrganizerEmail = e.Organizer?.Email ?? string.Empty
+                OrganizerEmail = e.Organizer?.Email ?? string.Empty,
+                Status = e.Status
             }));
         }
 
@@ -52,7 +54,8 @@ namespace Access.API.Controllers
                 TicketCapacity = e.TicketCapacity,
                 ImageUrl = e.ImageUrl,
                 OrganizerName = e.Organizer?.Name ?? string.Empty,
-                OrganizerEmail = e.Organizer?.Email ?? string.Empty
+                OrganizerEmail = e.Organizer?.Email ?? string.Empty,
+                Status = e.Status
             });
         }
 
@@ -67,7 +70,9 @@ namespace Access.API.Controllers
                 Price = dto.Price,
                 TicketCapacity = dto.TicketCapacity,
                 ImageUrl = dto.ImageUrl,
-                OrganizerId = dto.OrganizerId
+                OrganizerId = dto.OrganizerId,
+                // Events created by an admin are published directly
+                Status = EventStatus.Active
             };
 
             await _eventRepository.AddAsync(newEvent);
@@ -80,7 +85,8 @@ namespace Access.API.Controllers
                 Date = newEvent.Date,
                 Price = newEvent.Price,
                 TicketCapacity = newEvent.TicketCapacity,
-                ImageUrl = newEvent.ImageUrl
+                ImageUrl = newEvent.ImageUrl,
+                Status = newEvent.Status
             });
         }
 
@@ -97,6 +103,28 @@ namespace Access.API.Controllers
             eventItem.TicketCapacity = dto.TicketCapacity;
             eventItem.ImageUrl = dto.ImageUrl;
 
+            await _eventRepository.UpdateAsync(id, eventItem);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/approve")]
+        public async Task<IActionResult> ApproveEvent(int id)
+        {
+            var eventItem = await _eventRepository.GetByIdAsync(id);
+            if (eventItem == null) return NotFound();
+
+            eventItem.Status = EventStatus.Active;
+            await _eventRepository.UpdateAsync(id, eventItem);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/reject")]
+        public async Task<IActionResult> RejectEvent(int id)
+        {
+            var eventItem = await _eventRepository.GetByIdAsync(id);
+            if (eventItem == null) return NotFound();
+
+            eventItem.Status = EventStatus.Rejected;
             await _eventRepository.UpdateAsync(id, eventItem);
             return NoContent();
         }

@@ -1,4 +1,6 @@
-﻿namespace Access.API.DTOs
+﻿using Access.API.Enums;
+
+namespace Access.API.DTOs
 {
     public class AdminEventResponseDto
     {
@@ -11,5 +13,6 @@
         public string ImageUrl { get; set; } = string.Empty;
         public string OrganizerName { get; set; } = string.Empty;
         public string OrganizerEmail { get; set; } = string.Empty;
+        public EventStatus Status { get; set; }
     }
 }
