@@ -26,6 +26,7 @@ namespace Access.API.Controllers
         public async Task<ActionResult<IEnumerable<EventResponseDto>>> GetEvents()
         {
             var events = await _eventRepository.GetAllAsync();
+            var soldCounts = await _eventRepository.CountActiveTicketsByEventAsync();
 
             // Only approved events are public
             return Ok(events.Where(e => e.Status == EventStatus.Active).Select(e => new EventResponseDto
@@ -37,7 +38,10 @@ namespace Access.API.Controllers
                 Price = e.Price,
                 ImageUrl = e.ImageUrl,
                 TicketCapacity = e.TicketCapacity,
-                Status = e.Status
+                Status = e.Status,
+                OrganizerId = e.OrganizerId,
+                Location = e.Location,
+                TicketsSold = soldCounts.GetValueOrDefault(e.Id)
 
             }));
             
@@ -58,6 +62,7 @@ namespace Access.API.Controllers
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl,
                 TicketCapacity = dto.TicketCapacity,
+                Location = dto.Location,
                 // Organizer events always need admin approval
                 Status = EventStatus.Pending
             };
@@ -74,7 +79,10 @@ namespace Access.API.Controllers
                 Price = newEvent.Price,
                 ImageUrl = newEvent.ImageUrl,
                 TicketCapacity = newEvent.TicketCapacity,
-                Status = newEvent.Status
+                Status = newEvent.Status,
+                OrganizerId = newEvent.OrganizerId,
+                Location = newEvent.Location,
+                TicketsSold = 0
 
             };
             return CreatedAtAction(nameof(GetEvent), new { id = responseDto.Id }, responseDto);
@@ -90,6 +98,7 @@ namespace Access.API.Controllers
                 return NotFound();
             }
 
+            var soldCount = (await _eventRepository.CountActiveTicketsByEventAsync()).GetValueOrDefault(eventItem.Id);
             var responseDto = new EventResponseDto
             {
                 Id = eventItem.Id,
@@ -99,7 +108,10 @@ namespace Access.API.Controllers
                 Price = eventItem.Price,
                 ImageUrl = eventItem.ImageUrl,
                 TicketCapacity = eventItem.TicketCapacity,
-                Status = eventItem.Status
+                Status = eventItem.Status,
+                OrganizerId = eventItem.OrganizerId,
+                Location = eventItem.Location,
+                TicketsSold = soldCount
 
             };
             return responseDto;
@@ -132,6 +144,7 @@ namespace Access.API.Controllers
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl,
                 TicketCapacity = dto.TicketCapacity,
+                Location = dto.Location,
                 // Any change made by an organizer must be approved again
                 Status = EventStatus.Pending
             };
@@ -174,6 +187,7 @@ namespace Access.API.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var events = await _eventRepository.GetEventsByUserIdAsync(userId);
+            var soldCounts = await _eventRepository.CountActiveTicketsByEventAsync();
 
             return Ok(events.Select(e => new EventResponseDto
             {
@@ -184,7 +198,10 @@ namespace Access.API.Controllers
                 Price = e.Price,
                 ImageUrl = e.ImageUrl,
                 TicketCapacity = e.TicketCapacity,
-                Status = e.Status
+                Status = e.Status,
+                OrganizerId = e.OrganizerId,
+                Location = e.Location,
+                TicketsSold = soldCounts.GetValueOrDefault(e.Id)
             }));
         }
 

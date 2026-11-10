@@ -10,5 +10,6 @@ namespace Access.API.Repositories
         Task UpdateAsync(int id, Event newEvent);
         Task DeleteAsync(int id);
         Task<IEnumerable<Event>> GetEventsByUserIdAsync(int userId);
+        Task<Dictionary<int, int>> CountActiveTicketsByEventAsync();
     }
 }

@@ -12,5 +12,9 @@ namespace Access.API.DTOs
         public string ImageUrl { get; set; } = string.Empty;
         public int TicketCapacity {get; set;}
         public EventStatus Status { get; set; }
+        public int OrganizerId { get; set; }
+        public string Location { get; set; } = string.Empty;
+        /// <summary>Reserved + purchased tickets. Spots left = TicketCapacity - TicketsSold.</summary>
+        public int TicketsSold { get; set; }
     }
 }

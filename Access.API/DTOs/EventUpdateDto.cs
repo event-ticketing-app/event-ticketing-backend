@@ -10,6 +10,8 @@ namespace Access.API.DTOs
         [Range(0, double.MaxValue)]
                 public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
+        [MaxLength(200)]
+        public string Location { get; set; } = string.Empty;
         [Range(0, int.MaxValue)]
                 public int TicketCapacity { get; set; }
     }

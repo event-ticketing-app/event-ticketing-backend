@@ -34,7 +34,8 @@ namespace Access.API.Controllers
                 ImageUrl = e.ImageUrl,
                 OrganizerName = e.Organizer?.Name ?? string.Empty,
                 OrganizerEmail = e.Organizer?.Email ?? string.Empty,
-                Status = e.Status
+                Status = e.Status,
+                Location = e.Location
             }));
         }
 
@@ -55,7 +56,8 @@ namespace Access.API.Controllers
                 ImageUrl = e.ImageUrl,
                 OrganizerName = e.Organizer?.Name ?? string.Empty,
                 OrganizerEmail = e.Organizer?.Email ?? string.Empty,
-                Status = e.Status
+                Status = e.Status,
+                Location = e.Location
             });
         }
 
@@ -69,6 +71,7 @@ namespace Access.API.Controllers
                 Date = dto.Date,
                 Price = dto.Price,
                 TicketCapacity = dto.TicketCapacity,
+                Location = dto.Location,
                 ImageUrl = dto.ImageUrl,
                 OrganizerId = dto.OrganizerId,
                 // Events created by an admin are published directly
@@ -86,7 +89,8 @@ namespace Access.API.Controllers
                 Price = newEvent.Price,
                 TicketCapacity = newEvent.TicketCapacity,
                 ImageUrl = newEvent.ImageUrl,
-                Status = newEvent.Status
+                Status = newEvent.Status,
+                Location = newEvent.Location
             });
         }
 
@@ -101,6 +105,7 @@ namespace Access.API.Controllers
             eventItem.Date = dto.Date;
             eventItem.Price = dto.Price;
             eventItem.TicketCapacity = dto.TicketCapacity;
+            eventItem.Location = dto.Location;
             eventItem.ImageUrl = dto.ImageUrl;
 
             await _eventRepository.UpdateAsync(id, eventItem);

@@ -14,5 +14,6 @@ namespace Access.API.DTOs
         public string OrganizerName { get; set; } = string.Empty;
         public string OrganizerEmail { get; set; } = string.Empty;
         public EventStatus Status { get; set; }
+        public string Location { get; set; } = string.Empty;
     }
 }
