@@ -22,24 +22,33 @@ namespace Access.API.Controllers
             _ticketRepository = ticketRepository;
         }
 
+        private int CurrentUserId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
 
         [Authorize]
         [HttpPost("reserve")]
-
         public async Task<IActionResult> Reserve([FromBody] TicketReserveDto dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var reservedTicket = await _ticketService.ReserveTicket( dto.EventId, userId);
+            var reservedTicket = await _ticketService.ReserveTicket( dto.EventId, CurrentUserId);
 
             return CreatedAtAction(nameof(Reserve), reservedTicket);
+        }
 
+        /// <summary>Starts the Stripe payment for a reserved ticket. Returns the client secret used by Stripe.js.</summary>
+        [Authorize]
+        [HttpPost("{id}/payment-intent")]
+        public async Task<IActionResult> CreatePaymentIntent(int id)
+        {
+            var clientSecret = await _ticketService.CreatePaymentIntent(id, CurrentUserId);
+
+            return Ok(new { clientSecret });
         }
 
         [Authorize]
-        [HttpPost("purchase/{id}")]                
-        public async Task<IActionResult> Purchase(int id)
+        [HttpPost("purchase/{id}")]
+        public async Task<IActionResult> Purchase(int id, [FromBody] TicketPurchaseRequestDto? dto)
         {
-            var purchasedTicket = await _ticketService.PurchaseTicket(id);
+            var purchasedTicket = await _ticketService.PurchaseTicket(id, CurrentUserId, dto?.PaymentIntentId);
 
             return Ok(purchasedTicket);
         }
@@ -48,69 +57,43 @@ namespace Access.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TicketPurchaseResponseDto>> GetTicket(int id)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var ticketItem = await _ticketRepository.GetByIdWithDetailsAsync(id);
 
             if (ticketItem == null)
             {
                 return NotFound();
             }
-            if (ticketItem.UserId != userId && !User.IsInRole("Admin"))
+            if (ticketItem.UserId != CurrentUserId && !User.IsInRole("Admin"))
             {
                 return Forbid();
             }
-            var responseDto = new TicketPurchaseResponseDto
-            {
-                Id = ticketItem.Id,
-                EventName = ticketItem.Event.Name,
-                EventDescription = ticketItem.Event.Description,
-                UserName = ticketItem.User.Name,
-                Status = ticketItem.Status,
-                Price = ticketItem.Price,
-                EventDate = ticketItem.Event.Date,
-                PurchaseAt = DateTime.UtcNow,
-                ImageUrl = ticketItem.Event.ImageUrl
 
-            };
-            return responseDto;
+            return TicketMapper.ToPurchaseDto(ticketItem);
         }
+
         [Authorize]
         [HttpGet("my-tickets")]
         public async Task<ActionResult<IEnumerable<TicketPurchaseResponseDto>>> GetTickets()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var tickets = await _ticketRepository.GetTicketsByUserIdAsync(userId);
+            var tickets = await _ticketRepository.GetTicketsByUserIdAsync(CurrentUserId);
 
-            return Ok(tickets.Select(e => new TicketPurchaseResponseDto
-            {
-                Id = e.Id,
-                EventName = e.Event.Name,
-                EventDescription = e.Event.Description,
-                UserName = e.User.Name,
-                Status = e.Status,
-                Price = e.Price,
-                EventDate = e.Event.Date,
-                PurchaseAt = DateTime.UtcNow,
-                ImageUrl = e.Event.ImageUrl
-            }));
+            return Ok(tickets.Select(TicketMapper.ToPurchaseDto));
         }
+
         [Authorize]
         [HttpPost("cancel/{id}")]
         public async Task<IActionResult> Cancel(int id)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var ticket = await _ticketRepository.GetByIdWithDetailsAsync(id);
 
             if (ticket == null) return NotFound();
-            if (ticket.UserId != userId) return Forbid();
+            if (ticket.UserId != CurrentUserId) return Forbid();
             if (ticket.Status != TicketStatus.Reserved) return BadRequest("Ticket cannot be cancelled");
             ticket.Status = TicketStatus.Cancelled;
 
             await _ticketRepository.SaveAsync();
             return NoContent();
         }
-
-
     }
 
 }

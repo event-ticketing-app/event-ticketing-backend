@@ -6,6 +6,7 @@ namespace Access.API.Repositories
     {
         Task <int> CountActiveTicketsAsync(int eventId);
         Task<bool> HasActiveReservationAsync(int eventId, int userId);
+        Task<Ticket?> GetReservationAsync(int eventId, int userId);
         Task<Ticket> AddAsync(Ticket ticket, Event eventItem);
         Task<Ticket?> GetByIdWithDetailsAsync(int id);
         Task UpdateAsync(Ticket ticket);

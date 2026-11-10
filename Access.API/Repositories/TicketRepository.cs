@@ -29,6 +29,15 @@ namespace Access.API.Repositories
             return ticketuser;
         }
 
+        /// <summary>The user's ticket for this event that is still in Reserved status, if any.</summary>
+        public async Task<Ticket?> GetReservationAsync(int eventId, int userId)
+        {
+            return await _context.Tickets
+                .Where(t => t.EventId == eventId && t.UserId == userId && t.Status == TicketStatus.Reserved)
+                .OrderByDescending(t => t.ExpiresAt)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Ticket> AddAsync(Ticket ticket, Event eventItem)
         {
             _context.Tickets.Add(ticket);

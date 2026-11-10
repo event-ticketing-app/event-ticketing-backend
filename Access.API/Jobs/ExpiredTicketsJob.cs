@@ -1,5 +1,6 @@
 ﻿using Access.API.Data;
 using Access.API.Enums;
+using Access.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Access.API.Jobs
@@ -16,7 +17,9 @@ namespace Access.API.Jobs
 
         public async Task CancelExpiredTickets()
         {
-            var expiredTickets = await _context.Tickets.Where(t => (t.Status == TicketStatus.Reserved && t.ExpiresAt < DateTime.UtcNow)).ToListAsync();
+            // Leave a short grace period so a payment that finished right at the end can still be confirmed
+            var cutoff = DateTime.UtcNow.AddMinutes(-TicketRules.PaymentGraceMinutes);
+            var expiredTickets = await _context.Tickets.Where(t => (t.Status == TicketStatus.Reserved && t.ExpiresAt < cutoff)).ToListAsync();
 
             foreach (var ticket in expiredTickets) {
                 ticket.Status = TicketStatus.Cancelled;

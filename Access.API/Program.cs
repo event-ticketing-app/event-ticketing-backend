@@ -67,6 +67,10 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddScoped<ITicketService, TicketService>();
 
+// Stripe (test mode). The secret key lives in appsettings.Development.json, which is git-ignored.
+builder.Services.AddSingleton(new Stripe.StripeClient(builder.Configuration["Stripe:SecretKey"] ?? string.Empty));
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
